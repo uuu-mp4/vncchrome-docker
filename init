@@ -1,0 +1,51 @@
+#!/bin/bash
+
+_atexit() {
+    kill -TERM $socatpid
+    kill -TERM $chromepid
+    kill -TERM $vncpid
+}
+
+trap _atexit SIGTERM SIGINT
+
+socat TCP-LISTEN:9222,fork,reuseaddr TCP:localhost:9999 &
+socatpid=$!
+
+/usr/bin/Xtigervnc :0 \
+		   -SecurityTypes None \
+		   -geometry ${GEOMETRY} \
+		   -AcceptSetDesktopSize=0 \
+		   -nolisten unix &
+vncpid=$!
+
+gwidth=$(echo ${GEOMETRY} | cut -d 'x' -f 1)
+gheight=$(echo ${GEOMETRY} | cut -d 'x' -f 2)
+
+export DISPLAY=:0
+
+/usr/bin/google-chrome \
+    --disable-default-apps \
+    --disable-dev-shm-usage \
+    --disable-gpu \
+    --disable-setuid-sandbox \
+    --disable-sync \
+    --disable-application-cache \
+    --disable-infobars \
+    --disable-translate \
+    --disable-web-security \
+    --hide-scrollbars \
+    --ignore-certificate-errors \
+    --no-first-run \
+    --no-sandbox \
+    --no-zygote \
+    --user-data-dir=/data \
+    --test-type \
+    --window-position=0,0 \
+    --window-size=${gwidth},${gheight} \
+    --remote-debugging-port=9999 &
+
+chromepid=$!
+
+wait $socatpid
+wait $chromepid
+wait $vncpid
