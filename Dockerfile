@@ -6,7 +6,7 @@ ENV \
 	LANG='en_US.UTF-8' \
 	LANGUAGE='en_US:en' \
 	LC_ALL='en_US.UTF-8' \
-	TZ='America/Los_Angeles'
+	TZ='America/Chicago'
 
 RUN \
 	apt-get -y update && \
