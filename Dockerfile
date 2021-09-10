@@ -26,6 +26,8 @@ RUN \
 		tzdata \
 		wmctrl \
 		xdotool \
+		firefox \
+		autocutsel \
 		xterm && \
 	rm -rf /var/lib/apt/lists/*
 
